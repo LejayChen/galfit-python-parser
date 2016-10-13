@@ -35,12 +35,19 @@ class GalfitComponent(object):
             paramsplit = param.split('_')
             if '[' in val:     #fixed parameter
                 val = val.translate(None,'[]')
+                flag = 'fixed'
                 setattr(self,paramsplit[1].lower(),float(val))
-                setattr(self,paramsplit[1].lower() + '_err',None)
+                setattr(self,paramsplit[1].lower() + '_err',0)
             else:              #normal variable parameter
+                if '*' in val:     #uncertain parameter output
+                    val = val.translate(None,'*') 
+                    flag = 'uncertain'
+                else:
+                    flag = 'normal'
                 val = val.split()
                 setattr(self,paramsplit[1].lower(),float(val[0]))
                 setattr(self,paramsplit[1].lower() + '_err',float(val[2]))
+            setattr(self,paramsplit[1].lower()+'_flag',flag)
             
 class GalfitResults(object):
     """
@@ -96,4 +103,3 @@ class GalfitResults(object):
             setattr(self,"component_" + str(i),GalfitComponent(galfitheader,i))
 
         hdulist.close()
-        
